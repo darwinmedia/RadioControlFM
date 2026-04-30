@@ -1,13 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
-  <title>Radio Control de lo Alto 107.5 FM</title>
+  <title>Radio Control 107.5 FM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- FAVICON -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+
+  <!-- STYLES -->
   <link rel="stylesheet" href="styles.css">
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00c3ff">
+
+  <!-- 🔔 ONE SIGNAL -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.init({
+        appId: "1e2f468c-1da2-443c-b94b-8d8318f1795b",
+      });
+    });
+  </script>
 </head>
 
 <body>
@@ -16,53 +34,78 @@
 
   <!-- HEADER -->
   <header class="header">
-    <img src="assets/logo.png" class="logo">
-    <h1>Radio Control de lo Alto</h1>
-    <p>Transmitiendo bendición 24/7</p>
+    <p class="welcome-text">Bienvenido a Nuestra Transmisión en Directo</p>
+
+    <img src="assets/logo.png" class="logo" alt="Logo Radio">
+
+    <h1>Radio Control de lo Alto 107.5FM</h1>
+
+    <p class="subtitle">Transmitiendo bendición 24/7</p>
   </header>
 
-  <!-- PLAYER CARD -->
+  <!-- CARD -->
   <div class="card">
 
-    <!-- ESTADO -->
+    <!-- STATUS -->
     <div class="status">
       <span class="live-dot"></span>
       <span id="statusText">DETENIDO</span>
     </div>
 
-    <!-- ONDAS -->
+    <!-- WAVES -->
     <div class="waves">
       <span></span><span></span><span></span><span></span>
     </div>
 
-    <!-- BOTÓN -->
+    <!-- PLAY -->
     <button id="playBtn">▶ Escuchar</button>
 
-    <!-- TEXTO DINÁMICO -->
+    <!-- STATUS TEXT -->
     <div class="now-status" id="statusMsg">
       Listo para reproducir
     </div>
 
-    <!-- PANEL INFO -->
+    <!-- STREAM INFO -->
     <div class="panel">
       <div class="stream">📡 Stream: Darwin Audiomedia</div>
       <div class="state">Estado: Estable</div>
     </div>
 
-    <!-- AUDIO -->
-    <audio id="radio">
-      <source src="https://stream.zeno.fm/13k0quc5xhruv" type="audio/aac">
-    </audio>
+    <!-- METADATA -->
+    <div id="nowPlaying">🎶 Cargando información...</div>
+    <div id="listeners">👥 Oyentes: ...</div>
+
+    <!-- VOLUME -->
+    <div class="volume-control">
+      🔊 Volumen
+      <input id="volumeSlider" type="range" min="0" max="1" step="0.01" value="1">
+    </div>
 
   </div>
 
-<button id="installBtn" style="display:none;">
-  📲 Instalar App
-</button>
+  <!-- AUDIO -->
+  <audio id="radio" preload="none">
+    <source src="https://stream.zeno.fm/13k0quc5xhruv" type="audio/mpeg">
+  </audio>
+
+  <!-- ONE SIGNAL -->
+  <div class="onesignal-customlink-container"></div>
+
+  <!-- INSTALL APP -->
+  <div class="install-wrapper">
+    <button id="installBtn" style="display:none;">
+      📲 Instalar App
+    </button>
+  </div>
 
   <!-- FOOTER -->
   <footer>
-    © 2026 Radio Cristiana
+    © 2026 Radio Cristiana<br>
+    <a href="https://www.facebook.com/DarwinErazo777"
+       target="_blank"
+       class="credit">
+       Desarrollado por: Darwin Audiomedia Streaming
+    </a>
   </footer>
 
 </div>

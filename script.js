@@ -4,7 +4,14 @@ const statusDot = document.querySelector(".live-dot");
 const statusText = document.getElementById("statusText");
 const statusMsg = document.getElementById("statusMsg");
 const card = document.querySelector(".card");
+const installBtn = document.getElementById("installBtn");
+const volumeSlider = document.getElementById("volumeSlider");
 
+let deferredPrompt;
+
+/* =========================
+   ESTADOS
+========================= */
 function setState(state) {
   if (state === "live") {
     statusDot.style.background = "lime";
@@ -27,6 +34,9 @@ function setState(state) {
   }
 }
 
+/* =========================
+   PLAY / PAUSE
+========================= */
 btn.addEventListener("click", async () => {
   try {
     if (audio.paused) {
@@ -40,19 +50,33 @@ btn.addEventListener("click", async () => {
       setState("off");
     }
   } catch (e) {
+    console.log("Audio error:", e);
     setState("off");
   }
 });
 
+/* =========================
+   EVENTOS AUDIO
+========================= */
 audio.addEventListener("waiting", () => setState("buffer"));
 audio.addEventListener("playing", () => setState("live"));
 audio.addEventListener("pause", () => setState("off"));
 audio.addEventListener("error", () => setState("off"));
 
 setState("off");
-let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
 
+/* =========================
+   VOLUMEN
+========================= */
+if (volumeSlider) {
+  volumeSlider.addEventListener("input", () => {
+    audio.volume = volumeSlider.value;
+  });
+}
+
+/* =========================
+   INSTALL APP
+========================= */
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
@@ -65,50 +89,54 @@ installBtn.addEventListener("click", async () => {
 
   const { outcome } = await deferredPrompt.userChoice;
 
-  if (outcome === "accepted") {
-    console.log("App instalada");
-  } else {
-    console.log("Instalación cancelada");
-  }
+  console.log(outcome === "accepted"
+    ? "App instalada"
+    : "Instalación cancelada"
+  );
 
   deferredPrompt = null;
 });
 
+/* =========================
+   SERVICE WORKER
+========================= */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js")
     .then(() => console.log("SW registrado"))
     .catch(err => console.log("SW error", err));
 }
 
-// METADATA ZENO
+/* =========================
+   METADATA ZENO
+========================= */
 async function loadMetadata() {
   try {
     const res = await fetch("https://api.zeno.fm/mounts/metadata/subscribe/13k0quc5xhruv");
     const data = await res.json();
 
-    if (data && data.streamTitle) {
-      document.getElementById("nowPlaying").textContent =
-        "🎶 " + data.streamTitle;
-    }
-  } catch (e) {
+    document.getElementById("nowPlaying").textContent =
+      data?.streamTitle ? "🎶 " + data.streamTitle : "🎶 Transmisión en vivo";
+
+  } catch {
     document.getElementById("nowPlaying").textContent =
       "🎶 Transmisión en vivo";
   }
 }
 
-// actualizar cada 10 segundos
 setInterval(loadMetadata, 10000);
 loadMetadata();
 
+/* =========================
+   OYENTES
+========================= */
 async function loadListeners() {
   try {
     const res = await fetch("https://api.zeno.fm/mounts/13k0quc5xhruv");
     const data = await res.json();
 
-    if (data && data.listeners !== undefined) {
-      document.getElementById("listeners").textContent =
-        "👥 Oyentes: " + data.listeners;
-    }
+    document.getElementById("listeners").textContent =
+      "👥 Oyentes: " + (data?.listeners ?? "--");
+
   } catch {
     document.getElementById("listeners").textContent =
       "👥 Oyentes: --";
