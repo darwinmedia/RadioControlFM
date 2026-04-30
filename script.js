@@ -1,3 +1,6 @@
+/* =========================
+   ELEMENTOS
+========================= */
 const btn = document.getElementById("playBtn");
 const audio = document.getElementById("radio");
 const statusDot = document.querySelector(".live-dot");
@@ -6,6 +9,8 @@ const statusMsg = document.getElementById("statusMsg");
 const card = document.querySelector(".card");
 const installBtn = document.getElementById("installBtn");
 const volumeSlider = document.getElementById("volumeSlider");
+const nowPlaying = document.getElementById("nowPlaying");
+const listenersEl = document.getElementById("listeners");
 
 let deferredPrompt;
 
@@ -13,6 +18,8 @@ let deferredPrompt;
    ESTADOS
 ========================= */
 function setState(state) {
+  if (!statusDot || !statusText || !statusMsg || !card) return;
+
   if (state === "live") {
     statusDot.style.background = "lime";
     statusText.textContent = "EN VIVO";
@@ -37,65 +44,81 @@ function setState(state) {
 /* =========================
    PLAY / PAUSE
 ========================= */
-btn.addEventListener("click", async () => {
-  try {
-    if (audio.paused) {
-      setState("buffer");
-      await audio.play();
-      btn.textContent = "⏸ Detener";
-      setState("live");
-    } else {
-      audio.pause();
-      btn.textContent = "▶ Escuchar";
+if (btn && audio) {
+  btn.addEventListener("click", async () => {
+    try {
+      if (audio.paused) {
+        setState("buffer");
+        await audio.play();
+        btn.textContent = "⏸ Detener";
+        setState("live");
+      } else {
+        audio.pause();
+        btn.textContent = "▶ Escuchar";
+        setState("off");
+      }
+    } catch (e) {
+      console.log("Audio error:", e);
       setState("off");
     }
-  } catch (e) {
-    console.log("Audio error:", e);
-    setState("off");
-  }
-});
+  });
+}
 
 /* =========================
    EVENTOS AUDIO
 ========================= */
-audio.addEventListener("waiting", () => setState("buffer"));
-audio.addEventListener("playing", () => setState("live"));
-audio.addEventListener("pause", () => setState("off"));
-audio.addEventListener("error", () => setState("off"));
+if (audio) {
+  audio.addEventListener("waiting", () => setState("buffer"));
+  audio.addEventListener("playing", () => setState("live"));
+  audio.addEventListener("pause", () => setState("off"));
+  audio.addEventListener("error", () => setState("off"));
+}
 
 setState("off");
 
 /* =========================
    VOLUMEN
 ========================= */
-if (volumeSlider) {
+if (volumeSlider && audio) {
   volumeSlider.addEventListener("input", () => {
-    audio.volume = volumeSlider.value;
+    audio.volume = parseFloat(volumeSlider.value);
   });
 }
 
 /* =========================
-   INSTALL APP
+   INSTALL APP (FIX PRODUCCIÓN)
 ========================= */
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = "block";
+
+  setTimeout(() => {
+    deferredPrompt = e;
+
+    if (installBtn) {
+      installBtn.style.display = "block";
+    }
+
+  }, 1500);
 });
 
-installBtn.addEventListener("click", async () => {
-  installBtn.style.display = "none";
-  deferredPrompt.prompt();
+if (installBtn) {
+  installBtn.addEventListener("click", async () => {
+    installBtn.style.display = "none";
 
-  const { outcome } = await deferredPrompt.userChoice;
+    if (!deferredPrompt) return;
 
-  console.log(outcome === "accepted"
-    ? "App instalada"
-    : "Instalación cancelada"
-  );
+    deferredPrompt.prompt();
 
-  deferredPrompt = null;
-});
+    const { outcome } = await deferredPrompt.userChoice;
+
+    console.log(outcome === "accepted"
+      ? "App instalada"
+      : "Instalación cancelada"
+    );
+
+    deferredPrompt = null;
+  });
+}
 
 /* =========================
    SERVICE WORKER
@@ -114,12 +137,15 @@ async function loadMetadata() {
     const res = await fetch("https://api.zeno.fm/mounts/metadata/subscribe/13k0quc5xhruv");
     const data = await res.json();
 
-    document.getElementById("nowPlaying").textContent =
-      data?.streamTitle ? "🎶 " + data.streamTitle : "🎶 Transmisión en vivo";
+    if (nowPlaying) {
+      nowPlaying.textContent =
+        data?.streamTitle ? "🎶 " + data.streamTitle : "🎶 Transmisión en vivo";
+    }
 
   } catch {
-    document.getElementById("nowPlaying").textContent =
-      "🎶 Transmisión en vivo";
+    if (nowPlaying) {
+      nowPlaying.textContent = "🎶 Transmisión en vivo";
+    }
   }
 }
 
@@ -134,12 +160,15 @@ async function loadListeners() {
     const res = await fetch("https://api.zeno.fm/mounts/13k0quc5xhruv");
     const data = await res.json();
 
-    document.getElementById("listeners").textContent =
-      "👥 Oyentes: " + (data?.listeners ?? "--");
+    if (listenersEl) {
+      listenersEl.textContent =
+        "👥 Oyentes: " + (data?.listeners ?? "--");
+    }
 
   } catch {
-    document.getElementById("listeners").textContent =
-      "👥 Oyentes: --";
+    if (listenersEl) {
+      listenersEl.textContent = "👥 Oyentes: --";
+    }
   }
 }
 
