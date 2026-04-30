@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Radio Control de lo Alto 107.5 FM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00c3ff">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <img src="assets/logo.png" class="logo">
+    <h1>Radio Control de lo Alto</h1>
+    <p>Transmitiendo bendición 24/7</p>
+  </header>
+
+  <!-- PLAYER CARD -->
+  <div class="card">
+
+    <!-- ESTADO -->
+    <div class="status">
+      <span class="live-dot"></span>
+      <span id="statusText">DETENIDO</span>
+    </div>
+
+    <!-- ONDAS -->
+    <div class="waves">
+      <span></span><span></span><span></span><span></span>
+    </div>
+
+    <!-- BOTÓN -->
+    <button id="playBtn">▶ Escuchar</button>
+
+    <!-- TEXTO DINÁMICO -->
+    <div class="now-status" id="statusMsg">
+      Listo para reproducir
+    </div>
+
+    <!-- PANEL INFO -->
+    <div class="panel">
+      <div class="stream">📡 Stream: Darwin Audiomedia</div>
+      <div class="state">Estado: Estable</div>
+    </div>
+
+    <!-- AUDIO -->
+    <audio id="radio">
+      <source src="https://stream.zeno.fm/13k0quc5xhruv" type="audio/aac">
+    </audio>
+
+  </div>
+
+<button id="installBtn" style="display:none;">
+  📲 Instalar App
+</button>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2026 Radio Cristiana
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
