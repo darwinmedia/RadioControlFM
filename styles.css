@@ -211,3 +211,25 @@ footer {
   color: #00c3ff;
   text-decoration: underline;
 }
+
+.onesignal-customlink-container {
+  margin-top: 25px; /* separa de arriba */
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.onesignal-customlink-container {
+  margin: 30px auto 10px auto;
+  width: 100%;
+  text-align: center;
+}
+
+.card {
+  margin-top: 15px;
+}
+
+.install-wrapper {
+  margin-top: 20px;
+} 
+
